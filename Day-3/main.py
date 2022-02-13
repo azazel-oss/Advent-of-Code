@@ -1,33 +1,34 @@
-class Data:
-    def __init__(self):
-        self.one_count = 0
-        self.zero_count = 0
-
-
-data_list = []
+current_one_count_oxygen = 0
+current_one_count_carbon = 0
+current_zero_count_oxygen = 0
+current_zero_count_carbon = 0
+oxygen = ''
+carbon = ''
 
 for i in range(12):
-    data_list.append(Data())
+    with open('data.txt', 'r') as file:
+        for data in file.readlines():
+            if data.strip().startswith(oxygen):
+                if data.strip()[len(oxygen):][0] == '1':
+                    current_one_count_oxygen += 1
+                else:
+                    current_zero_count_oxygen += 1
 
-with open('data.txt', 'r') as file:
-    for data in file.readlines():
-        for index, bit in enumerate(data.strip()):
-            if bit == '1':
-                data_list[index].one_count += 1
-            else:
-                data_list[index].zero_count += 1
+            if data.strip().startswith(carbon):
+                if data.strip()[len(carbon):][0] == '1':
+                    current_one_count_carbon += 1
+                else:
+                    current_zero_count_carbon += 1
 
-gamma_bits = []
-epsilon_bits = []
-for i in range(len(data_list)):
-    gamma_digit = '1' if data_list[i].one_count > data_list[i].zero_count else '0'
-    epsilon_digit = '1' if data_list[i].one_count < data_list[i].zero_count else '0'
-    gamma_bits.append(gamma_digit)
-    epsilon_bits.append(epsilon_digit)
+    oxygen += '0' if current_zero_count_oxygen > current_one_count_oxygen else '1'
+    if current_zero_count_carbon == 0:
+        carbon += '1'
+    elif current_one_count_carbon == 0:
+        carbon += '0'
+    else:
+        carbon += '1' if current_zero_count_carbon > current_one_count_carbon else '0'
 
-gamma = ''.join(gamma_bits)
-gamma = int(gamma, 2)
-epsilon = ''.join(epsilon_bits)
-epsilon = int(epsilon, 2)
+    current_zero_count_oxygen = current_one_count_oxygen = current_zero_count_carbon = current_one_count_carbon = 0
 
-print(gamma * epsilon)
+print(oxygen, carbon)
+print(int(oxygen, 2) * int(carbon, 2))
